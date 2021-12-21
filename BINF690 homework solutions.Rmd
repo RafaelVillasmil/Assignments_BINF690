@@ -61,7 +61,58 @@ Assignment 2
 Assignment 3
 Solve problems 5.12 and 6.4. 
 
-```{r}
+```{r problem_5.12}
+Ealimit <- 5
+Ea <- 101
+
+xi <- 0
+xi_memory_1 <- NA
+xi_memory_2 <- NA
+xr_memory <- NA
+xu <- 1
+
+#should be updated accorging to problem
+first_dev <- function(x) {
+  y <- -12*x^5-6*x^3+10
+  return(y)
+}
+
+while (Ea > Ealimit){
+ 
+  yi <- first_dev(xi)
+  yu <- first_dev(xu)
+  
+  yproduct <- yi*yu
+  
+  if (yproduct > 0) {
+    xr_memory <- xr} 
+
+  xr <- (xi+xu)/2
+  
+ if (yproduct < 0) {
+    xr_memory <- xi
+    xi <- xr
+ } else {
+    if (is.na(xi_memory_1)) {
+      xu <- xr
+      } else {
+        xu <- xi
+        xi <- xi_memory_2
+          }
+ }
+  
+  if (is.na(xi_memory_1)){
+    xi_memory_1 <- 2*xr
+    } else {
+      xi_memory_2 <- xi_memory_1
+      xi_memory_1 <- xi
+    }
+  
+  Ea <- abs((xr_memory - xr) * 100/ xr)
+ 
+}
+
+print(xu)
 
 ```
 
