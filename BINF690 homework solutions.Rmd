@@ -116,6 +116,51 @@ print(xu)
 
 ```
 
+```{r find_roots_newtow_raphson_method}
+# tip graph fuctions and start upwards after a maxima or minimum
+
+
+# orignal_func and first derivative must be upstated according to problem
+
+original_func <- function(x) {
+  y <- -1+5.5*x-4*x^2+0.5*x^3
+  return(y)
+}
+
+first_dev <- function(x) {
+  y <- 5.5-8*x+1.5*x^2
+  return(y)
+}
+
+# enter Es percentage as a percentage 
+Es <- 0.01
+
+Et <- 101
+root_memory <- NA
+
+xi<- 5
+
+counter <- 0
+while (Et > Es){
+  counter <- counter + 1
+#  print(c(counter,Et,root_memory))
+  
+  if (is.na(root_memory)) {root_memory <- xi}
+  
+  root <- root_memory - original_func(root_memory)/first_dev(root_memory)
+  
+  Et <- abs(100* (root_memory - root)/root)
+  
+  root_memory <- root
+}
+
+counter <- counter + 1
+cat(c("Steps: ", counter, "Root: ", root))
+
+```
+
+
+
 Assignment 4
 Solve problem 9.9
 ```{r solve_variables_multiple_equations}
