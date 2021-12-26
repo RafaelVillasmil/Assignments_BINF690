@@ -272,7 +272,7 @@ Find two errors in section IV of Lecture notes (NumericalMethodsMD.pdf).
 
 Assignment 11
 Homework on Monte Carlo algorithm
-Consider a single atom, which has the potential energy E(x)=kcx2, where x is atom’s
+Consider a single atom, which has the potential energy E(x)=kc*x^2, where x is atom’s
 coordinate and kc=0.1 is a constant. Develop a Monte Carlo (MC) program, which
 computes the average energy <E> of this atom at the temperatures T from 0.1 to 1.0 with
 the increment of 0.1. For simplicity assume that kB=1. Set maximum position
@@ -284,7 +284,66 @@ Include in the table the number of MC steps performed to obtain <E> at each T. I
 need to see your code.
 Optional assignment for extra credit: Compute the acceptance rate at each temperature
 and investigate its dependence on temperature.
-```{r}
+
+```{r monte_carlo_Average_energy}
+
+# data input
+kc <- 0.1
+kB <- 1
+dx <- 10
+x0 <- 100
+t0 <- 0.1
+tf <- 1
+dt <- 0.1
+
+# derived constants for this code
+
+# matrix for data storage
+col_names <- c("Temperature", "Expected_Ea", "Calculated_Ea", "Iterations", "Accepted_Iterations", "Acceptance_Rate")
+Temperature <- c(seq(t0, tf, by = dt))
+
+results <- as.data.frame(matrix(NA, nrow = length(Temperature), ncol = length(col_names)))
+
+colnames(results) <- col_names
+
+results[,Temperature] <- Temperature
+results[,"Expected_Ea"] <- results[,"Temperature"]/2
+
+
+for (i in 1:nrow(results)){
+  
+  temp <- results[i,"Temperature"]
+  
+  # while loop preamble 
+  Energy_limit <- (1+dx/100)*temp/2
+  Energy_average <- 2 * Energy_limit
+  Ei_sum <- 0
+  counter_iterations <- 0
+  counter_accepted <-0
+  x <- x0
+  possible_steps <- c(seq(from = (-1*dx), to = dx))
+  
+  while (Energy_average > Energy_limit){
+    counter_iterations <- counter_iterations + 1
+    energy0 <- kc * x^2
+    x1 <- x + sample(possible_steps, 1)
+    energy1 <- kc * (x1)^2
+    rel_bolxtman <- exp(-(energy1-energy0)/(kB*temp))
+    if (rel_bolxtman > runif(1)) {
+      x <- x1
+      counter_accepted <- counter_accepted + 1 }
+    Ei_sum <- Ei_sum + energy0
+    Energy_average <- Ei_sum / counter_iterations
+  }
+  
+  results[i,"Calculated_Ea"] <- Energy_average
+  results[i,"Iterations"] <- counter_iterations
+  results[i,"Accepted_Iterations"] <- counter_accepted
+  
+}
+results[,"Acceptance_Rate"] <- results[,"Accepted_Iterations"] / results[,"Iterations"]
+
+plot(results[,"Temperature"], results[,"Acceptance_Rate"])
 
 ```
 
