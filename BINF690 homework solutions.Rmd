@@ -212,17 +212,77 @@ Assignment 5
 
 ```{r}
 
+# for the function f(x,y) = -8x+x^2+12y+4y^2-2xy
+function_xy <- function(x,y) {
+  z <- -8*x+x^2+12*y+4*y^2-2*x*y
+  return(z)
+}
+
+first_der_x <- function(x) {
+  y <- -8+2*x-2*y
+  return(y)
+}
+
+firstder_y <- function(y) {
+  x <- 12+8*y-2*x
+  return(x)
+}
+
 ```
 
 Assignment
 Assignment 6
 1. Solve problem 17.7 (5th textbook edition) or 17.6 (6th or 7th editions).
-2. Use the data from problem 18.4 (5th edition) or 18.5 (6th or 7th editions) to predict the value of the function at x=2.8. Use fifth order interpolating polynomial.  
+ 
+```{r least_squares_regression_to_fit_a_straight_line}
+x_values <- c(1, 2, 3, 4, 5, 6, 7, 8, 9)
+y_values <- c(1, 1.5, 2, 3, 4, 5, 8, 10, 13)
 
+ls_table <- data.frame(x_values, y_values)
+ls_table[,"x^2"] <- ls_table[,"x_values"]^2 
+ls_table[,"xy"] <- ls_table[,"x_values"] * ls_table[,"y_values"]
 
-```{r}
+n <- nrow(ls_table)
+
+slope <- ((n*sum(ls_table[,"xy"])) - (sum(ls_table[,"x_values"])*sum(ls_table[,"y_values"])))/((n*sum(ls_table[,"x^2"]))-(sum(ls_table[,"x_values"])^2))
+
+intercept <- (sum(ls_table[,"y_values"]) - (slope *sum(ls_table[,"x_values"]))) / n
+
+ls_table[,"estimate_y"] <- slope* ls_table[,"x_values"] + intercept
+
+plot(ls_table[,"x_values"], ls_table[,"y_values"])
+lines(ls_table[,"x_values"], ls_table[,"estimate_y"] )
+
+ls_table[,"yi-y_mean"] <- abs(ls_table[,"y_values"] - mean(ls_table[,"y_values"]))
+
+Sy <- sqrt(sum(ls_table[,"yi-y_mean"])/(n-1))
+
+Syx <- sqrt((sum((ls_table[,"y_values"] - ls_table[,"estimate_y"])^2))/(n-2))
+
+if (Syx < Sy) {
+  
+  r2 <- sqrt((sum(ls_table[,"yi-y_mean"])-sum((ls_table[,"y_values"] - ls_table[,"estimate_y"])^2))/(sum(ls_table[,"yi-y_mean"])))
+  
+  cat("Syx < Sy, the linear regresion has merit.",
+      (round(r2, 3)*100), "% of the original uncertainty has been explained by the linear model")
+}
+```
+
+2. Use the data from problem 18.4 (5th edition) or 18.5 (6th or 7th editions) to predict the value of the function at x=2.8. Use fifth order interpolating polynomial. 
+```{r fifth_order_interpolating_polynomial}
+x_values <- c(1, 2, 3, 4, 5, 6, 7, 8, 9)
+y_values <- c(1, 1.5, 2, 3, 4, 5, 8, 10, 13)
+
+ipol_table <- data.frame(x_values, y_values)
+ipol_table[,"x^2"] <- ipol_table[,"x_values"]^2
+ipol_table[,"x^3"] <- ipol_table[,"x_values"]^3
+ipol_table[,"x^4"] <- ipol_table[,"x_values"]^4
+ipol_table[,"xi^2yi"] <- ipol_table[,"x^2"] * ipol_table[,"x_values"]
+ipol_table[,"yi"] <- ipol_table[,"x_values"]^2
 
 ```
+
+
 
 Midterm exam (BINF690)
 1. Determine positive roots of the function f(x)=10cos(x)e-x/5–x1/3+1.8. Use (a)
