@@ -1,0 +1,155 @@
+---
+title: "BINF690 Midterm Fall 2020"
+author: "Rafael Villasmil"
+date: "1/16/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Determine positive roots of the function𝒇(𝒙)=𝟏𝟎𝐜𝐨𝐬(𝒙)𝒆ି𝒙𝟓−𝒙𝟏𝟑+𝟏.𝟖. 
+Use 
+(a) graphical method; 
+(b) Newton-Raphson method. All roots must be determined with the absolute 
+approximate error no larger than 𝑬𝒂= 𝟏𝟎ି𝟔. 
+
+
+```{r find roots}
+# question is only about positive roots
+# becasue x^(1/3) is greatern than 10*cos(x)*exp(-1*x/5) +1.8 after 13.22, 
+# series stops at 14
+# steps of 0.05 provides good display for graph
+
+#create x series for plot
+x <- seq(from = 0, to = 14, by = 0.05)
+
+#define function for ploting
+original_func <- function(x){
+  y <- 10*cos(x)*exp(-1*x/5)-x^(1/3)+1.8
+  return(y)
+}
+
+#plot x data and y=0 line to indicate roots.
+plot(x,original_func(x))
+abline(h=0)
+
+resolution <- 10^-6
+roots <- NULL
+for (i in seq(from = 0, to = 14, by = resolution)){
+  if ((original_func(i) < resolution)&&(original_func(i)) > (-1 * resolution)){
+    if (is.null(roots)) {
+      roots <- i} 
+      else {
+        if (i>(roots[length(roots)]+2*resolution)){
+          roots <- append(roots, i, after = length(roots))}
+      }
+  }
+}
+
+cat("Roots are ", roots)
+```
+```{r find_roots_newton_raphson_method}
+
+# orignal_func and first derivative must be updated according to problem
+
+original_func <- function(x){
+  y <- 10*cos(x)*exp(-1*x/5)-x^(1/3)+1.8
+  return(y)
+}
+
+first_dev <- function(x) {
+  y <- -10*sin(x)*exp(-1*x/5)-2*cos(x)*exp(-1*x/5)-1/(3*x^(2/3))
+  return(y)
+}
+
+# enter Es percentage as a percentage 
+Es <- 0.01
+
+Et <- 101
+root_memory <- NA
+
+xi<- 11
+
+counter <- 0
+while (Et > Es){
+  counter <- counter + 1
+#  print(c(counter,Et,root_memory))
+  
+  if (is.na(root_memory)) {root_memory <- xi}
+  
+  root <- root_memory - original_func(root_memory)/first_dev(root_memory)
+  
+  Et <- abs(100* (root_memory - root)/root)
+  
+  root_memory <- root
+}
+
+counter <- counter + 1
+cat("Steps: ", counter, "Root: ", root, "\n")
+
+```
+
+
+```{r find_roots_newton_raphson_method for multiple roots}
+
+# orignal_func and first derivative must be updated according to problem
+
+original_func <- function(x){
+  y <- 10*cos(x)*exp(-1*x/5)-x^(1/3)+1.8
+  return(y)
+}
+
+first_dev <- function(x) {
+  y <- -10*sin(x)*exp(-1*x/5)-2*cos(x)*exp(-1*x/5)-1/(3*x^(2/3))
+  return(y)
+}
+
+# enter Es percentage as a percentage 
+Es <- 0.01
+Et <- 101
+resolution <- 10^-6
+root_memory <- Es
+
+for (i in seq(from = Es, to = 14, by = resolution)){
+  counter <- 0
+  
+  while (Et > Es){
+    
+    counter <- counter + 1
+    
+  #  print(c(counter,Et,root_memory))
+    
+    root <- root_memory - original_func(root_memory)/first_dev(root_memory)
+    
+    Et <- abs(100* (root_memory - root)/root)
+    
+    root_memory <- root
+  }
+  
+  counter <- counter + 1
+  cat("Steps: ", counter, "Root: ", root, "\n")
+  
+  Et <- 101 
+  i <- root 
+  
+  while (abs(first_dev(i+resolution)-(first_dev(i)))>=resolution){
+    i <- i + resolution
+  }
+  
+  while (abs(original_func(i+resolution)-original_func(i))<resolution){
+    i <- i + resolution
+  }
+  
+  root_memory <- i
+}
+```
+
+2.Using Gaussian elimination with partial pivoting solve linear algebraic 
+equations  
+𝒙𝟏+𝒙𝟐−𝒙𝟑= −𝟑𝟔
+𝒙𝟏+𝟐𝒙𝟐+𝟐𝒙𝟑= 𝟐
+−𝟑𝒙𝟏+𝟒𝒙𝟐+𝒙𝟑= 𝟏
+
+lso, compute the value of determinant.  

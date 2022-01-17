@@ -1,0 +1,38 @@
+"0","for (i in 1:nrow(eq_matrix)){
+  for (j in 1:ncol(solutions)){
+    addition <- addition + (original_matrix[i,j]*solutions[1,j])
+  }
+  cat(""Solution to equation "", i, "" is "", addition, ""\n"")
+  addition <- 0
+}
+"
+"1","Solution to equation "
+"1"," "
+"1","1"
+"1"," "
+"1"," is "
+"1"," "
+"1","-3"
+"1"," "
+"1","
+"
+"1","Solution to equation "
+"1"," "
+"1","2"
+"1"," "
+"1"," is "
+"1"," "
+"1","2"
+"1"," "
+"1","
+"
+"1","Solution to equation "
+"1"," "
+"1","3"
+"1"," "
+"1"," is "
+"1"," "
+"1","1"
+"1"," "
+"1","
+"
