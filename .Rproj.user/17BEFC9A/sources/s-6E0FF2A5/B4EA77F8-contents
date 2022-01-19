@@ -264,24 +264,162 @@ if (Syx < Sy) {
   r2 <- sqrt((sum(ls_table[,"yi-y_mean"])-sum((ls_table[,"y_values"] - ls_table[,"estimate_y"])^2))/(sum(ls_table[,"yi-y_mean"])))
   
   cat("Syx < Sy, the linear regresion has merit.",
-      (round(r2, 3)*100), "% of the original uncertainty has been explained by the linear model")
+      (round(r2, 3)*100), "% of the original uncertainty has been explained by the linear model", "\n")
+  cat("Least Square Regression:  y=", slope, "* x", intercept,"\n")
+  
 }
+
+
 ```
 
 2. Use the data from problem 18.4 (5th edition) or 18.5 (6th or 7th editions) to predict the value of the function at x=2.8. Use fifth order interpolating polynomial. 
-```{r fifth_order_interpolating_polynomial}
+
+```{r first_order_polynomial-regresion}
+# data 
 x_values <- c(1, 2, 3, 4, 5, 6, 7, 8, 9)
 y_values <- c(1, 1.5, 2, 3, 4, 5, 8, 10, 13)
 
-ipol_table <- data.frame(x_values, y_values)
-ipol_table[,"x^2"] <- ipol_table[,"x_values"]^2
-ipol_table[,"x^3"] <- ipol_table[,"x_values"]^3
-ipol_table[,"x^4"] <- ipol_table[,"x_values"]^4
-ipol_table[,"xi^2yi"] <- ipol_table[,"x^2"] * ipol_table[,"x_values"]
-ipol_table[,"yi"] <- ipol_table[,"x_values"]^2
+# number of data sets 
+m <- 2
+n <- length(x_values)
+xmean <- mean(x_values) 
+ymean <- mean(y_values)
+xsum <- sum(x_values)
+ysum <- sum(y_values)
+xp2sum <- sum(x_values^2)
+xp3sum <- sum(x_values^3)
+xp4sum <- sum(x_values^4)
+xysum <- sum(x_values*y_values)
+xp2ysum <- sum(((x_values^2)*y_values))
 
+# create matrix of equations 
+eq1 <- c(n,     xsum,   xp2sum, ysum)
+eq2 <- c(xsum,  xp2sum, xp3sum, xysum)
+eq3 <- c(xp2sum,xp3sum, xp4sum, xp2ysum)
+
+original_matrix <- data.frame(eq1, eq2, eq3)
+
+eq_matrix <- t(original_matrix)
+
+# normalize equations to the one with lowest row
+for (rowcheck in 1:(nrow(eq_matrix)-1)){
+  denominator <- eq_matrix[rowcheck,rowcheck]
+  for (i in rowcheck:(nrow(eq_matrix)-1)){
+    for (j in 1:ncol(eq_matrix)){
+      if (j==rowcheck) {numerator <- eq_matrix[(i+1),j]}
+      eq_matrix[(i+1),j] <- (eq_matrix[(i+1),j] - ((numerator/denominator) * eq_matrix[rowcheck,j]))
+    }
+  }  
+}
+
+# solve for Xs
+
+solutions <- matrix(NA, ncol=nrow(eq_matrix))
+
+for (i in nrow(eq_matrix):2){
+  xi <- (eq_matrix[i,ncol(eq_matrix)] - sum(eq_matrix[i,1:(i-1)])) / eq_matrix[i,i]
+  solutions[1,i] <- xi
+  for (j in i:1){
+    eq_matrix[j,ncol(eq_matrix)] <- eq_matrix[j,ncol(eq_matrix)] - (xi *eq_matrix[j,i])
+    eq_matrix[j,i] <- 0
+  }
+}
+
+solutions[1,1] <- eq_matrix[1,ncol(eq_matrix)]/eq_matrix[1,1]
+
+yi_values <- NULL
+for (i in 1:length(x_values)){
+  for (j in 1:length(solutions)){
+    if (j==1){newyi <-solutions[1]} 
+      else{newyi <-newyi + solutions[j] * x_values[i]^(j-1)}
+  }
+  yi_values <- append(yi_values, newyi, length(yi_values))
+}
+
+yi_values
+
+plot(x_values,y_values)
+lines(x_values,y_values,type="l",col="red")
+lines(x_values,yi_values,col="green")
+
+sumyremainp2 <- sum((y_values-yi_values)^2)
+sumyremainp2
 ```
+```{r second_order_polynomial-regresion}
+# data 
+x_values <- c(1, 2, 3, 4, 5, 6, 7, 8, 9)
+y_values <- c(1, 1.5, 2, 3, 4, 5, 8, 10, 13)
 
+# number of data sets 
+m <- 2
+n <- length(x_values)
+xmean <- mean(x_values) 
+ymean <- mean(y_values)
+xsum <- sum(x_values)
+ysum <- sum(y_values)
+xp2sum <- sum(x_values^2)
+xp3sum <- sum(x_values^3)
+xp4sum <- sum(x_values^4)
+xp5sum <- sum(x_values^5)
+xp6sum <- sum(x_values^6)
+xysum <- sum(x_values*y_values)
+xp2ysum <- sum(((x_values^2)*y_values))
+xp3ysum <- sum(((x_values^3)*y_values))
+
+# create matrix of equations 
+eq1 <- c(n,      xsum,   xp2sum, xp3sum, ysum)
+eq2 <- c(xsum,   xp2sum, xp3sum, xp4sum, xysum)
+eq3 <- c(xp2sum, xp3sum, xp4sum, xp5sum, xp2ysum)
+eq4 <- c(xp3sum, xp4sum, xp5sum, xp6sum, xp3ysum)
+
+original_matrix <- data.frame(eq1, eq2, eq3, eq4)
+
+eq_matrix <- t(original_matrix)
+  
+# normalize equations to the one with lowest row
+for (rowcheck in 1:(nrow(eq_matrix)-1)){
+  denominator <- eq_matrix[rowcheck,rowcheck]
+  for (i in rowcheck:(nrow(eq_matrix)-1)){
+    for (j in 1:ncol(eq_matrix)){
+      if (j==rowcheck) {numerator <- eq_matrix[(i+1),j]}
+      eq_matrix[(i+1),j] <- (eq_matrix[(i+1),j] - ((numerator/denominator) * eq_matrix[rowcheck,j]))
+    }
+  }  
+}
+
+# solve for Xs
+
+solutions <- matrix(NA, ncol=nrow(eq_matrix))
+
+for (i in nrow(eq_matrix):2){
+  xi <- (eq_matrix[i,ncol(eq_matrix)] - sum(eq_matrix[i,1:(i-1)])) / eq_matrix[i,i]
+  solutions[1,i] <- xi
+  for (j in i:1){
+    eq_matrix[j,ncol(eq_matrix)] <- eq_matrix[j,ncol(eq_matrix)] - (xi *eq_matrix[j,i])
+    eq_matrix[j,i] <- 0
+  }
+}
+
+solutions[1,1] <- eq_matrix[1,ncol(eq_matrix)]/eq_matrix[1,1]
+
+yi_values <- NULL
+for (i in 1:length(x_values)){
+  for (j in 1:length(solutions)){
+    if (j==1){newyi <-solutions[1]} 
+      else{newyi <-newyi + solutions[j] * x_values[i]^(j-1)}
+  }
+  yi_values <- append(yi_values, newyi, length(yi_values))
+}
+
+yi_values
+
+plot(x_values,y_values)
+lines(x_values,y_values,type="l",col="red")
+lines(x_values,yi_values,col="green")
+
+sumyremainp2 <- sum((y_values-yi_values)^2)
+sumyremainp2
+```
 
 
 Midterm exam (BINF690)
@@ -305,8 +443,11 @@ original_func <- function(x){
 }
 
 #plot x data and y=0 line to indicate roots.
-plot(x,original_func(x))
-abline(h=0)
+plot(x,original_func(x), xaxt = "n")
+axis(1, at = seq(round(min(x)),
+                 round(max(x)), by = 1))
+abline(h=0,v=seq(round(min(x)),
+                 round(max(x)), by = 1))
 
 resolution <- 10^-6
 roots <- NULL
@@ -343,7 +484,7 @@ Es <- 0.01
 Et <- 101
 root_memory <- NA
 
-xi<- 11
+xi<- 13
 
 counter <- 0
 while (Et > Es){
@@ -701,10 +842,37 @@ f(x) 3 6 19 99 291 444
 Using these data calculate f(x=4) applying the interpolating polynomials of the 1st
 through 4th orders, i.e., in all consider four interpolations. Will the 5th order
 interpolation improve the prediction of f(x=4)?
+
+```{r general_interpolating_polynomials}
+
+# enter and organize data
+x_values <-  c(1, 2, 3, 5, 7, 8)
+fx_values <- c(3, 6, 19, 99, 291, 444)
+
+original_matrix <- data.frame(x_values, fx_values)
+i<-1
+j<-1
+
+# calculate finite divided differences
+
+for (i in 1:((nrow(original_matrix)-1))){
+  original_matrix <- cbind(original_matrix, NA)
+  names(original_matrix)[names(original_matrix) == "NA"] <- i
+  for (j in 1:((table(is.na(original_matrix[,as.character(i)]))-1))){
+    colgrep <- grep(as.character(i), colnames(original_matrix))
+    original_matrix[j,colgrep] <- 
+      (original_matrix[(j+1),(colgrep-1)] - original_matrix[j,(colgrep-1)])/
+      (original_matrix[colgrep,"x_values"] - original_matrix[(colgrep-1),"x_values"])
+  }
+}
+```
+
+
 2. Problem 21.15. Before solving this problem study the example 21.9 in the
 textbook; to obtain analytical solution, first integrate over x from -3 to 1, then
 over y from 0 to 2, and finally over z from -2 to 2. Compute relative true error
 using the difference between analytical and numerical solutions.
+
 3. Solve the differential equation from t=0 to t=3 using Euler and 4th order Runge-
 Kutta methods2
 ty
@@ -713,6 +881,7 @@ dy −=
 , y(0)=0
 Use the integration step of 0.2. Compute the approximate error at t=3 as a
 difference between two numerical solutions.
+
 4. Using Euler method solve the system of differential equations
 
 
@@ -726,8 +895,9 @@ dt
 dx
 x
 dt
-dy 5.0
-Apply the following initial conditions: x(t=0)=0 and1)0( ==ty . Set the
+dy 
+
+5.0 Apply the following initial conditions: x(t=0)=0 and1)0( ==ty . Set the
 integration step to t=0.1. What are the values of x(t=10) and y(t=10)?
 Include the codes used to solve the problems. Answers should be highlighted.
 
