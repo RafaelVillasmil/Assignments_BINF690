@@ -850,6 +850,8 @@ x_values <-  c(1, 2, 3, 5, 7, 8)
 fx_values <- c(3, 6, 19, 99, 291, 444)
 
 original_matrix <- data.frame(x_values, fx_values)
+i<-1
+j<-1
 
 # calculate finite divided differences
 
@@ -860,7 +862,7 @@ for (i in 1:((nrow(original_matrix)-1))){
     colgrep <- grep(as.character(i), colnames(original_matrix))
     original_matrix[j,colgrep] <- 
       (original_matrix[(j+1),(colgrep-1)] - original_matrix[j,(colgrep-1)])/
-      (original_matrix[(j+1),(colgrep-2)] - original_matrix[j,(colgrep-2)])
+      (original_matrix[colgrep,"x_values"] - original_matrix[(colgrep-1),"x_values"])
   }
 }
 ```

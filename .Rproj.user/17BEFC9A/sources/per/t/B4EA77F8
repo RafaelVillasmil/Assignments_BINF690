@@ -3,9 +3,9 @@
     "path": "~/GitHub/Assignments BINF690/BINF690 homework solutions.Rmd",
     "project_path": "BINF690 homework solutions.Rmd",
     "type": "r_markdown",
-    "hash": "0",
+    "hash": "178456687",
     "contents": "",
-    "dirty": true,
+    "dirty": false,
     "created": 1639948193581.0,
     "source_on_save": false,
     "relative_order": 1,
@@ -16,11 +16,11 @@
         "scrollLine": "839"
     },
     "folds": "",
-    "lastKnownWriteTime": 1642465274,
+    "lastKnownWriteTime": 1642644165,
     "encoding": "UTF-8",
     "collab_server": "",
     "source_window": "",
-    "last_content_update": 1642470978700,
+    "last_content_update": 1642644165733,
     "read_only": false,
     "read_only_alternatives": []
 }

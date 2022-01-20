@@ -110,11 +110,11 @@ first_dev <- function(x) {
 Es <- 0.01
 Et <- 101
 resolution <- 10^-6
+root_memory <- Es
 
 for (i in seq(from = Es, to = 14, by = resolution)){
-  root_memory <- i
-  
   counter <- 0
+  
   while (Et > Es){
     
     counter <- counter + 1
@@ -141,6 +141,8 @@ for (i in seq(from = Es, to = 14, by = resolution)){
   while (abs(original_func(i+resolution)-original_func(i))<resolution){
     i <- i + resolution
   }
+  
+  root_memory <- i
 }
 ```
 
